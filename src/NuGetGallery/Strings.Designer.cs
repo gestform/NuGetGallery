@@ -97,15 +97,6 @@ namespace NuGetGallery {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Account &apos;{0}&apos; cannot be deleted because it is a member of an organization. The user needs to be manually removed from any organizations before the account can be deleted..
-        /// </summary>
-        public static string AccountDelete_OrganizationMemberDeleteNotImplemented {
-            get {
-                return ResourceManager.GetString("AccountDelete_OrganizationMemberDeleteNotImplemented", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The account:{0} was deleted succesfully..
         /// </summary>
         public static string AccountDelete_Success {
@@ -125,11 +116,20 @@ namespace NuGetGallery {
         
         /// <summary>
         ///   Looks up a localized string similar to The account with the email {0} is linked to another Microsoft account.
-        ///If you wish to update the linked Microsoft account you can do so from the account settings page..
+        ///If you would like to update the linked Microsoft account you can do so from the account settings page..
         /// </summary>
         public static string AccountIsLinkedToAnotherExternalAccount {
             get {
                 return ResourceManager.GetString("AccountIsLinkedToAnotherExternalAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An exception was encoutered while trying to delete the account. Please contact support for assistance..
+        /// </summary>
+        public static string AccountSelfDelete_Fail {
+            get {
+                return ResourceManager.GetString("AccountSelfDelete_Fail", resourceCulture);
             }
         }
         
@@ -143,11 +143,47 @@ namespace NuGetGallery {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is no request for user &apos;{0}&apos; for join this organization with that token..
+        /// </summary>
+        public static string AddMember_MissingRequest {
+            get {
+                return ResourceManager.GetString("AddMember_MissingRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You cannot accept this request because you no longer meet the requirements of this organization. {0} Please contact support for more details..
+        /// </summary>
+        public static string AddMember_PolicyFailure {
+            get {
+                return ResourceManager.GetString("AddMember_PolicyFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are now a member of organization &apos;{0}&apos;..
+        /// </summary>
+        public static string AddMember_Success {
+            get {
+                return ResourceManager.GetString("AddMember_Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User &apos;{0}&apos; has not linked their account to an AAD credential matching this organization..
         /// </summary>
         public static string AddMember_UserDoesNotMeetOrganizationPolicy {
             get {
                 return ResourceManager.GetString("AddMember_UserDoesNotMeetOrganizationPolicy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User &apos;{0}&apos; is an organization and cannot be a member of another organization..
+        /// </summary>
+        public static string AddMember_UserIsOrganization {
+            get {
+                return ResourceManager.GetString("AddMember_UserIsOrganization", resourceCulture);
             }
         }
         
@@ -388,6 +424,15 @@ namespace NuGetGallery {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The specified API key is scoped to an owner that is unconfirmed. You must confirm the owner that this API key is scoped to before you can use it..
+        /// </summary>
+        public static string ApiKeyOwnerUnconfirmed {
+            get {
+                return ResourceManager.GetString("ApiKeyOwnerUnconfirmed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An API key must be provided in the &apos;X-NuGet-ApiKey&apos; header to use this service.
         /// </summary>
         public static string ApiKeyRequired {
@@ -411,6 +456,15 @@ namespace NuGetGallery {
         public static string ApiKeyUserAccountIsUnconfirmed {
             get {
                 return ResourceManager.GetString("ApiKeyUserAccountIsUnconfirmed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument cannot be null or empty..
+        /// </summary>
+        public static string ArgumentCannotBeNullOrEmpty {
+            get {
+                return ResourceManager.GetString("ArgumentCannotBeNullOrEmpty", resourceCulture);
             }
         }
         
@@ -452,6 +506,24 @@ namespace NuGetGallery {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The pending organization member was deleted..
+        /// </summary>
+        public static string CancelMemberRequest_Success {
+            get {
+                return ResourceManager.GetString("CancelMemberRequest_Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There is no request for user &apos;{0}&apos; to join this organization..
+        /// </summary>
+        public static string CancelMembershipRequest_MissingRequest {
+            get {
+                return ResourceManager.GetString("CancelMembershipRequest_MissingRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enqueuing unavailable: the gallery is currently in read only mode, with limited service. Please try again later..
         /// </summary>
         public static string CannotEnqueueDueToReadOnly {
@@ -466,6 +538,24 @@ namespace NuGetGallery {
         public static string CannotRemoveOnlyLoginCredential {
             get {
                 return ResourceManager.GetString("CannotRemoveOnlyLoginCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The certificate does not exist..
+        /// </summary>
+        public static string CertificateDoesNotExist {
+            get {
+                return ResourceManager.GetString("CertificateDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A certificate file is required..
+        /// </summary>
+        public static string CertificateFileIsRequired {
+            get {
+                return ResourceManager.GetString("CertificateFileIsRequired", resourceCulture);
             }
         }
         
@@ -632,7 +722,7 @@ namespace NuGetGallery {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Organization member was deleted..
+        ///   Looks up a localized string similar to The organization member was deleted..
         /// </summary>
         public static string DeleteMember_Success {
             get {
@@ -651,7 +741,7 @@ namespace NuGetGallery {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email address &apos;{0}&apos; is being used..
+        ///   Looks up a localized string similar to The email address &apos;{0}&apos; is already in use by a different account..
         /// </summary>
         public static string EmailAddressBeingUsed {
             get {
@@ -887,6 +977,15 @@ namespace NuGetGallery {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your organization must be confirmed before you can change its membership..
+        /// </summary>
+        public static string Member_OrganizationUnconfirmed {
+            get {
+                return ResourceManager.GetString("Member_OrganizationUnconfirmed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please enter a message..
         /// </summary>
         public static string MessageIsRequired {
@@ -937,6 +1036,33 @@ namespace NuGetGallery {
         public static string MissingRequiredConfigurationValue {
             get {
                 return ResourceManager.GetString("MissingRequiredConfigurationValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Two-factor authentication has been disabled for your account. Please close all sessions for Microsoft accounts before you log into {0} to prevent automatic enabling of this setting..
+        /// </summary>
+        public static string MultiFactorAuth_Disabled {
+            get {
+                return ResourceManager.GetString("MultiFactorAuth_Disabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Two-factor authentication is enabled for your account. It will be enforced the next time you log into {0}..
+        /// </summary>
+        public static string MultiFactorAuth_Enabled {
+            get {
+                return ResourceManager.GetString("MultiFactorAuth_Enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We noticed you used two-factor authentication for login. We have enabled your account to use two-factor authentication going forward..
+        /// </summary>
+        public static string MultiFactorAuth_LoginUpdate {
+            get {
+                return ResourceManager.GetString("MultiFactorAuth_LoginUpdate", resourceCulture);
             }
         }
         
@@ -1042,9 +1168,9 @@ namespace NuGetGallery {
         /// <summary>
         ///   Looks up a localized string similar to Account &apos;{0}&apos; does not support organizations..
         /// </summary>
-        public static string Organizations_NotInDomainWhitelist {
+        public static string Organizations_NotSupportedForAccount {
             get {
-                return ResourceManager.GetString("Organizations_NotInDomainWhitelist", resourceCulture);
+                return ResourceManager.GetString("Organizations_NotSupportedForAccount", resourceCulture);
             }
         }
         
@@ -1265,6 +1391,15 @@ namespace NuGetGallery {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is no request for user &apos;{0}&apos; for join this organization with that token..
+        /// </summary>
+        public static string RejectMembershipRequest_NotFound {
+            get {
+                return ResourceManager.GetString("RejectMembershipRequest_NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user &apos;{0}&apos; does not have permission to remove the owner &apos;{1}&apos;..
         /// </summary>
         public static string RemoveOwner_NotAllowed {
@@ -1279,6 +1414,69 @@ namespace NuGetGallery {
         public static string RemoveOwner_NotOwner {
             get {
                 return ResourceManager.GetString("RemoveOwner_NotOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to At least one package owner has no certificate while at least one other package owner has at least one certificate, which means future package submissions may be unsigned or signed with any certificate registered to any owner..
+        /// </summary>
+        public static string RequiredSigner_AnyWithMixedResult {
+            get {
+                return ResourceManager.GetString("RequiredSigner_AnyWithMixedResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All package owners have at least one certificate, which means future package submissions must be signed..
+        /// </summary>
+        public static string RequiredSigner_AnyWithSignedResult {
+            get {
+                return ResourceManager.GetString("RequiredSigner_AnyWithSignedResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All package owners have at least one certificate, which means future package submissions must be signed..
+        /// </summary>
+        public static string RequiredSigner_AnyWithUnsignedResult {
+            get {
+                return ResourceManager.GetString("RequiredSigner_AnyWithUnsignedResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to change the required signer for this package?.
+        /// </summary>
+        public static string RequiredSigner_Confirm {
+            get {
+                return ResourceManager.GetString("RequiredSigner_Confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; currently has at least one certificate, which means future package submissions must be signed..
+        /// </summary>
+        public static string RequiredSigner_OwnerHasAtLeastOneCertificate {
+            get {
+                return ResourceManager.GetString("RequiredSigner_OwnerHasAtLeastOneCertificate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; currently has no certificate, which means future package submissions must be unsigned..
+        /// </summary>
+        public static string RequiredSigner_OwnerHasNoCertificate {
+            get {
+                return ResourceManager.GetString("RequiredSigner_OwnerHasNoCertificate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This action will change the required signer to &apos;{0}&apos; for all future submissions for this package..
+        /// </summary>
+        public static string RequiredSigner_ThisAction {
+            get {
+                return ResourceManager.GetString("RequiredSigner_ThisAction", resourceCulture);
             }
         }
         
@@ -1625,6 +1823,15 @@ namespace NuGetGallery {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The transform request for your account has been successfully cancelled..
+        /// </summary>
+        public static string TransformAccount_Cancelled {
+            get {
+                return ResourceManager.GetString("TransformAccount_Cancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An unexpected error occurred while transforming this account. Contact support for assistance..
         /// </summary>
         public static string TransformAccount_Failed {
@@ -1634,11 +1841,29 @@ namespace NuGetGallery {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The transform request you are attempting to cancel was not found..
+        /// </summary>
+        public static string TransformAccount_FailedMissingRequestToCancel {
+            get {
+                return ResourceManager.GetString("TransformAccount_FailedMissingRequestToCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Organization account &apos;{0}&apos; does not exist..
         /// </summary>
         public static string TransformAccount_OrganizationAccountDoesNotExist {
             get {
                 return ResourceManager.GetString("TransformAccount_OrganizationAccountDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The transform request for you to become an admin of &apos;{0}&apos; has been successfully cancelled..
+        /// </summary>
+        public static string TransformAccount_Rejected {
+            get {
+                return ResourceManager.GetString("TransformAccount_Rejected", resourceCulture);
             }
         }
         
@@ -1940,11 +2165,74 @@ namespace NuGetGallery {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The file exceeds the size limit of {0} bytes..
+        /// </summary>
+        public static string ValidateCertificate_FileTooLarge {
+            get {
+                return ResourceManager.GetString("ValidateCertificate_FileTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file must be a DER encoded binary X.509 certificate..
+        /// </summary>
+        public static string ValidateCertificate_InvalidEncoding {
+            get {
+                return ResourceManager.GetString("ValidateCertificate_InvalidEncoding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file length is invalid..
+        /// </summary>
+        public static string ValidateCertificate_InvalidFileLength {
+            get {
+                return ResourceManager.GetString("ValidateCertificate_InvalidFileLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file extension must be {0}..
+        /// </summary>
+        public static string ValidateCertificate_InvalidFileType {
+            get {
+                return ResourceManager.GetString("ValidateCertificate_InvalidFileType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file stream is invalid..
+        /// </summary>
+        public static string ValidateCertificate_InvalidStream {
+            get {
+                return ResourceManager.GetString("ValidateCertificate_InvalidStream", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file stream must be seekable..
+        /// </summary>
+        public static string ValidateCertificate_StreamMustBeSeekable {
+            get {
+                return ResourceManager.GetString("ValidateCertificate_StreamMustBeSeekable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User &apos;{0}&apos; does not have the rights to upload new versions of package &apos;{1}&apos;..
         /// </summary>
         public static string VerifyPackage_OwnerInvalid {
             get {
                 return ResourceManager.GetString("VerifyPackage_OwnerInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User &apos;{0}&apos; is unconfirmed and cannot be the owner of the package..
+        /// </summary>
+        public static string VerifyPackage_OwnerUnconfirmed {
+            get {
+                return ResourceManager.GetString("VerifyPackage_OwnerUnconfirmed", resourceCulture);
             }
         }
         

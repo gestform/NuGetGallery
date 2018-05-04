@@ -166,7 +166,7 @@ namespace NuGetGallery
             }
 
             var authenticatedUser = authenticationResult.AuthenticatedUser;
-            
+            bool usedMultiFactorAuthentication = false;
             if (linkingAccount)
             {
                 // Verify account has no other external accounts
@@ -180,11 +180,14 @@ namespace NuGetGallery
                 }
 
                 // Link with an external account
-                authenticatedUser = await AssociateCredential(authenticatedUser);
+                var loginUserDetails = await AssociateCredential(authenticatedUser);
+                authenticatedUser = loginUserDetails?.AuthenticatedUser;
                 if (authenticatedUser == null)
                 {
                     return ExternalLinkExpired();
                 }
+
+                usedMultiFactorAuthentication = loginUserDetails.UsedMultiFactorAuthentication;
             }
 
             // If we are an administrator and Gallery.EnforcedAuthProviderForAdmin is set
@@ -197,7 +200,7 @@ namespace NuGetGallery
             }
 
             // Create session
-            await _authService.CreateSessionAsync(OwinContext, authenticatedUser);
+            await _authService.CreateSessionAsync(OwinContext, authenticatedUser, usedMultiFactorAuthentication);
 
             TempData["ShowPasswordDeprecationWarning"] = true;
             return SafeRedirect(returnUrl);
@@ -265,6 +268,7 @@ namespace NuGetGallery
             }
 
             AuthenticatedUser user;
+            var usedMultiFactorAuthentication = false;
             try
             {
                 if (linkingAccount)
@@ -275,6 +279,7 @@ namespace NuGetGallery
                         return ExternalLinkExpired();
                     }
 
+                    usedMultiFactorAuthentication = result.LoginDetails?.WasMultiFactorAuthenticated ?? false;
                     user = await _authService.Register(
                         model.Register.Username,
                         model.Register.EmailAddress,
@@ -299,7 +304,7 @@ namespace NuGetGallery
             if (NuGetContext.Config.Current.ConfirmEmailAddresses && !string.IsNullOrEmpty(user.User.UnconfirmedEmailAddress))
             {
                 _messageService.SendNewAccountEmail(
-                    new MailAddress(user.User.UnconfirmedEmailAddress, user.User.Username),
+                    user.User,
                     Url.ConfirmEmail(
                         user.User.Username,
                         user.User.EmailConfirmationToken,
@@ -316,7 +321,7 @@ namespace NuGetGallery
             }
 
             // Create session
-            await _authService.CreateSessionAsync(OwinContext, user);
+            await _authService.CreateSessionAsync(OwinContext, user, usedMultiFactorAuthentication);
             return RedirectFromRegister(returnUrl);
         }
 
@@ -432,11 +437,11 @@ namespace NuGetGallery
         }
 
         [NonAction]
-        public ActionResult ChallengeAuthentication(string returnUrl, string provider)
+        public ActionResult ChallengeAuthentication(string returnUrl, string provider, AuthenticationPolicy policy = null)
         {
             try
             {
-                return _authService.Challenge(provider, returnUrl);
+                return _authService.Challenge(provider, returnUrl, policy);
             }
             catch (InvalidOperationException)
             {
@@ -473,7 +478,8 @@ namespace NuGetGallery
 
                 // Authenticate with the new credential after successful replacement
                 var authenticatedUser = await _authService.Authenticate(newCredential);
-                await _authService.CreateSessionAsync(OwinContext, authenticatedUser);
+                var usedMultiFactorAuthentication = result.LoginDetails?.WasMultiFactorAuthenticated ?? false;
+                await _authService.CreateSessionAsync(OwinContext, authenticatedUser, usedMultiFactorAuthentication);
 
                 // Get email address of the new credential for updating success message
                 var newEmailAddress = GetEmailAddressFromExternalLoginResult(result, out string errorReason);
@@ -519,8 +525,31 @@ namespace NuGetGallery
                     return challenge;
                 }
 
+                if (ShouldEnforceMultiFactorAuthentication(result))
+                {
+                    // Invoke the authentication again enforcing multi-factor authentication for the same provider.
+                    return ChallengeAuthentication(
+                        Url.LinkExternalAccount(returnUrl),
+                        result.Authenticator.Name,
+                        new AuthenticationPolicy() { Email = result.LoginDetails.EmailUsed, EnforceMultiFactorAuthentication = true });
+                }
+
                 // Create session
-                await _authService.CreateSessionAsync(OwinContext, result.Authentication);
+                await _authService.CreateSessionAsync(OwinContext,
+                    result.Authentication,
+                    wasMultiFactorAuthenticated: result?.LoginDetails?.WasMultiFactorAuthenticated ?? false);
+
+                // Update the 2FA if used during login but user does not have it set on their account. Only for personal microsoft accounts.
+                if (result?.LoginDetails != null
+                    && result.LoginDetails.WasMultiFactorAuthenticated
+                    && !result.Authentication.User.EnableMultiFactorAuthentication
+                    && CredentialTypes.IsMicrosoftAccount(result.Credential.Type))
+                {
+                    await _userService.ChangeMultiFactorAuthentication(result.Authentication.User, enableMultiFactor: true);
+                    OwinContext.AddClaim(NuGetClaims.EnabledMultiFactorAuthentication);
+                    TempData["Message"] = Strings.MultiFactorAuth_LoginUpdate;
+                }
+
                 return SafeRedirect(returnUrl);
             }
             else
@@ -589,6 +618,25 @@ namespace NuGetGallery
             }
         }
 
+        internal bool ShouldEnforceMultiFactorAuthentication(AuthenticateExternalLoginResult result)
+        {
+            if (result?.Authenticator == null || result.Authentication == null)
+            {
+                return false;
+            }
+
+            // Enforce multi-factor authentication only if:
+            // 1. The authenticator supports multi-factor authentication, otherwise no use.
+            // 2. The user has enabled multi-factor authentication for their account.
+            // 3. The user authenticated with the personal microsoft account. AAD 2FA policy is controlled by the tenant admins.
+            // 4. The user did not use the multi-factor authentication for the session, obviously.
+            return result.Authenticator.SupportsMultiFactorAuthentication()
+                && result.Authentication.User.EnableMultiFactorAuthentication
+                && !result.LoginDetails.WasMultiFactorAuthenticated
+                && result.Authentication.CredentialUsed.IsExternal()
+                && (CredentialTypes.IsMicrosoftAccount(result.Authentication.CredentialUsed.Type));
+        }
+
         private string FormatEmailAddressForAssistance(string email)
         {
             var emailParts = email.Split('@');
@@ -620,7 +668,7 @@ namespace NuGetGallery
             return RedirectToAction(actionName: "Thanks", controllerName: "Users");
         }
 
-        private async Task<AuthenticatedUser> AssociateCredential(AuthenticatedUser user)
+        private async Task<LoginUserDetails> AssociateCredential(AuthenticatedUser user)
         {
             var result = await _authService.ReadExternalLoginCredential(OwinContext);
             if (result.ExternalIdentity == null)
@@ -641,7 +689,10 @@ namespace NuGetGallery
             // Notify the user of the change
             _messageService.SendCredentialAddedNotice(user.User, _authService.DescribeCredential(result.Credential));
 
-            return new AuthenticatedUser(user.User, result.Credential);
+            return new LoginUserDetails {
+                AuthenticatedUser = new AuthenticatedUser(user.User, result.Credential),
+                UsedMultiFactorAuthentication = result.LoginDetails?.WasMultiFactorAuthenticated ?? false
+            };
         }
 
         private List<AuthenticationProviderViewModel> GetProviders()

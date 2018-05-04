@@ -33,7 +33,7 @@ namespace NuGetGallery
             }
 
             var emailClaim = claimsIdentity.FindFirst(emailClaimType);
-            return new IdentityInformation(identifierClaim.Value, nameClaim.Value, emailClaim?.Value, authType, tenantId: null);
+            return new IdentityInformation(identifierClaim.Value, nameClaim.Value, emailClaim?.Value, authType, tenantId: null, usedMultiFactorAuth: false);
         }
 
         public static bool HasDiscontinuedLoginClaims(ClaimsIdentity identity)
@@ -56,6 +56,45 @@ namespace NuGetGallery
             return identity
                 .GetClaimOrDefault(claimType)?
                 .Equals(BooleanClaimDefault, StringComparison.OrdinalIgnoreCase)
+                ?? false;
+        }
+
+        public static Claim CreateBooleanClaim(string claimType)
+        {
+            return new Claim(claimType, BooleanClaimDefault);
+        }
+
+        public static void AddExternalLoginCredentialTypeClaim(List<Claim> claims, string credentialType)
+        {
+            string claimValue = null;
+            if (CredentialTypes.IsMicrosoftAccount(credentialType))
+            {
+                claimValue = NuGetClaims.ExternalLoginCredentialValues.MicrosoftAccount;
+            }
+            else if (CredentialTypes.IsAzureActiveDirectoryAccount(credentialType))
+            {
+                claimValue = NuGetClaims.ExternalLoginCredentialValues.AzureActiveDirectory;
+            }
+
+            if (!string.IsNullOrEmpty(claimValue))
+            {
+                claims.Add(new Claim(NuGetClaims.ExternalLoginCredentialType, claimValue));
+            }
+        }
+
+        public static bool LoggedInWithMicrosoftAccount(ClaimsIdentity identity)
+        {
+            return identity
+                .GetClaimOrDefault(NuGetClaims.ExternalLoginCredentialType)?
+                .Equals(NuGetClaims.ExternalLoginCredentialValues.MicrosoftAccount, StringComparison.OrdinalIgnoreCase)
+                ?? false;
+        }
+
+        public static bool LoggedInWithAzureActiveDirectory(ClaimsIdentity identity)
+        {
+            return identity
+                .GetClaimOrDefault(NuGetClaims.ExternalLoginCredentialType)?
+                .Equals(NuGetClaims.ExternalLoginCredentialValues.AzureActiveDirectory, StringComparison.OrdinalIgnoreCase)
                 ?? false;
         }
     }

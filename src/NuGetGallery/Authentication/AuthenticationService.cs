@@ -233,10 +233,15 @@ namespace NuGetGallery.Authentication
             }
         }
 
-        public virtual async Task CreateSessionAsync(IOwinContext owinContext, AuthenticatedUser user)
+        /// <summary>
+        /// Generate the new session for the logged in user. Also, set the appropriate claims for the user in this session.
+        /// The multi-factor authentication setting value can be obtained from external logins(in case of AADv2).
+        /// </summary>
+        /// <returns>Awaitable task</returns>
+        public virtual async Task CreateSessionAsync(IOwinContext owinContext, AuthenticatedUser authenticatedUser, bool wasMultiFactorAuthenticated = false)
         {
             // Create a claims identity for the session
-            ClaimsIdentity identity = CreateIdentity(user.User, AuthenticationTypes.LocalUser, await GetDiscontinuedLoginClaims(user));
+            ClaimsIdentity identity = CreateIdentity(authenticatedUser.User, AuthenticationTypes.LocalUser, await GetUserLoginClaims(authenticatedUser, wasMultiFactorAuthenticated));
 
             // Issue the session token and clean up the external token if present
             owinContext.Authentication.SignIn(identity);
@@ -244,10 +249,10 @@ namespace NuGetGallery.Authentication
 
             // Write an audit record
             await Auditing.SaveAuditRecordAsync(
-                new UserAuditRecord(user.User, AuditedUserAction.Login, user.CredentialUsed));
+                new UserAuditRecord(authenticatedUser.User, AuditedUserAction.Login, authenticatedUser.CredentialUsed));
         }
 
-        private async Task<Claim[]> GetDiscontinuedLoginClaims(AuthenticatedUser user)
+        private async Task<Claim[]> GetUserLoginClaims(AuthenticatedUser user, bool wasMultiFactorAuthenticated)
         {
             await _contentObjectService.Refresh();
 
@@ -267,6 +272,18 @@ namespace NuGetGallery.Authentication
             {
                 ClaimsExtensions.AddBooleanClaim(claims, NuGetClaims.ExternalLogin);
             }
+
+            if (user.User.EnableMultiFactorAuthentication)
+            {
+                ClaimsExtensions.AddBooleanClaim(claims, NuGetClaims.EnabledMultiFactorAuthentication);
+            }
+
+            if (wasMultiFactorAuthenticated)
+            {
+                ClaimsExtensions.AddBooleanClaim(claims, NuGetClaims.WasMultiFactorAuthenticated);
+            }
+
+            ClaimsExtensions.AddExternalLoginCredentialTypeClaim(claims, user.CredentialUsed.Type);
 
             return claims.ToArray();
         }
@@ -484,7 +501,7 @@ namespace NuGetGallery.Authentication
             return true;
         }
 
-        public virtual ActionResult Challenge(string providerName, string redirectUrl)
+        public virtual ActionResult Challenge(string providerName, string redirectUrl, AuthenticationPolicy policy = null)
         {
             Authenticator provider;
 
@@ -504,7 +521,7 @@ namespace NuGetGallery.Authentication
                     providerName));
             }
 
-            return provider.Challenge(redirectUrl);
+            return provider.Challenge(redirectUrl, policy);
         }
 
         public virtual async Task AddCredential(User user, Credential credential)
@@ -622,7 +639,8 @@ namespace NuGetGallery.Authentication
                     Authentication = null,
                     ExternalIdentity = externalIdentity,
                     Authenticator = authenticator,
-                    Credential = _credentialBuilder.CreateExternalCredential(userInfo.AuthenticationType, userInfo.Identifier, identity, userInfo.TenantId)
+                    Credential = _credentialBuilder.CreateExternalCredential(userInfo.AuthenticationType, userInfo.Identifier, identity, userInfo.TenantId),
+                    LoginDetails = new ExternalLoginSessionDetails(userInfo.Email, userInfo.UsedMultiFactorAuthentication)
                 };
             }
             catch (Exception ex)

@@ -8,9 +8,21 @@ namespace NuGetGallery
         public const string Account = "Account";
         public const string OrganizationAccount = "ManageOrganization";
         public const string AddOrganization = "AddOrganization";
+        public const string OrganizationMemberAddAjax = "AddMember";
+        public const string OrganizationMemberAdd = "AddMemberJson";
+        public const string OrganizationMemberConfirm = "ConfirmMemberRequest";
+        public const string OrganizationMemberReject = "RejectMemberRequest";
+        public const string OrganizationMemberCancelAjax = "CancelMemberRequest";
+        public const string OrganizationMemberCancel = "CancelMemberRequestJson";
+        public const string OrganizationMemberUpdateAjax = "UpdateMember";
+        public const string OrganizationMemberUpdate = "UpdateMemberJson";
+        public const string OrganizationMemberDeleteAjax = "DeleteMember";
+        public const string OrganizationMemberDelete = "DeleteMemberJson";
         public const string ChangeOrganizationEmailSubscription = "ChangeOrganizationEmailSubscription";
         public const string TransformToOrganization = "TransformToOrganization";
-        public const string TransformToOrganizationConfirmation = "ConfirmTransformToOrganization";
+        public const string TransformToOrganizationConfirmation = "ConfirmTransform";
+        public const string TransformToOrganizationRejection = "RejectTransform";
+        public const string TransformToOrganizationCancellation = "CancelTransform";
         public const string ApiKeys = "ApiKeys";
         public const string Profile = "Profile";
         public const string DisplayPackage = "package-route";
@@ -66,6 +78,7 @@ namespace NuGetGallery
         public const string ConfirmAccount = "ConfirmAccount";
         public const string SigninAssistance = "SigninAssistance";
         public const string ChangeEmailSubscription = "ChangeEmailSubscription";
+        public const string ChangeMultiFactorAuthentication = "ChangeMultiFactorAuthentication";
         public const string ErrorReadOnly = "ErrorReadOnly";
         public const string Error500 = "Error500";
         public const string Error404 = "Error404";
@@ -78,5 +91,14 @@ namespace NuGetGallery
         public const string Downloads = "Downloads";
         public const string AdminDeleteAccount = "AdminDeleteAccount";
         public const string UserDeleteAccount = "DeleteAccount";
+        public const string AddUserCertificate = "AddUserCertificate";
+        public const string DeleteUserCertificate = "DeleteUserCertificate";
+        public const string GetUserCertificate = "GetUserCertificate";
+        public const string GetUserCertificates = "GetUserCertificates";
+        public const string AddOrganizationCertificate = "AddOrganizationCertificate";
+        public const string DeleteOrganizationCertificate = "DeleteOrganizationCertificate";
+        public const string GetOrganizationCertificate = "GetOrganizationCertificate";
+        public const string GetOrganizationCertificates = "GetOrganizationCertificates";
+        public const string SetRequiredSigner = "SetRequiredSigner";
     }
 }

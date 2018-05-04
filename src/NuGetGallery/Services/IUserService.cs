@@ -8,11 +8,17 @@ namespace NuGetGallery
 {
     public interface IUserService
     {
-        Task<Membership> AddMemberAsync(Organization organization, string memberName, bool isAdmin);
+        Task<MembershipRequest> AddMembershipRequestAsync(Organization organization, string memberName, bool isAdmin);
+
+        Task RejectMembershipRequestAsync(Organization organization, string memberName, string confirmationToken);
+
+        Task<User> CancelMembershipRequestAsync(Organization organization, string memberName);
+
+        Task<Membership> AddMemberAsync(Organization organization, string memberName, string confirmationToken);
 
         Task<Membership> UpdateMemberAsync(Organization organization, string memberName, bool isAdmin);
 
-        Task DeleteMemberAsync(Organization organization, string memberName);
+        Task<User> DeleteMemberAsync(Organization organization, string memberName);
 
         Task ChangeEmailSubscriptionAsync(User user, bool emailAllowed, bool notifyPackagePushed);
 
@@ -22,15 +28,17 @@ namespace NuGetGallery
 
         IList<User> FindByUnconfirmedEmailAddress(string unconfirmedEmailAddress, string optionalUsername);
 
-        User FindByUsername(string username);
+        User FindByUsername(string username, bool includeDeleted = false);
 
-        User FindByKey(int key);
+        User FindByKey(int key, bool includeDeleted = false);
 
         Task<bool> ConfirmEmailAddress(User user, string token);
 
         Task ChangeEmailAddress(User user, string newEmailAddress);
 
         Task CancelChangeEmailAddress(User user);
+
+        Task ChangeMultiFactorAuthentication(User user, bool enableMultiFactor);
 
         Task<IDictionary<int, string>> GetEmailAddressesForUserKeysAsync(IReadOnlyCollection<int> distinctUserKeys);
 
@@ -41,6 +49,10 @@ namespace NuGetGallery
         Task RequestTransformToOrganizationAccount(User accountToTransform, User adminUser);
         
         Task<bool> TransformUserToOrganization(User accountToTransform, User adminUser, string token);
+
+        Task<bool> RejectTransformUserToOrganizationRequest(User accountToTransform, User adminUser, string token);
+
+        Task<bool> CancelTransformUserToOrganizationRequest(User accountToTransform, string token);
 
         Task<Organization> AddOrganizationAsync(string username, string emailAddress, User adminUser);
     }

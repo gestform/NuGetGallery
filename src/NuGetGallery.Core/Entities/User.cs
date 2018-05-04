@@ -47,9 +47,11 @@ namespace NuGetGallery
             SecurityPolicies = new List<UserSecurityPolicy>();
             ReservedNamespaces = new HashSet<ReservedNamespace>();
             Organizations = new List<Membership>();
+            OrganizationMigrationRequests = new List<OrganizationMigrationRequest>();
             OrganizationRequests = new List<MembershipRequest>();
             Roles = new List<Role>();
             Username = username;
+            UserCertificates = new List<UserCertificate>();
         }
 
         /// <summary>
@@ -66,6 +68,11 @@ namespace NuGetGallery
         /// Request to transform a <see cref="User"/> account into an <see cref="Organization"/> account.
         /// </summary>
         public virtual OrganizationMigrationRequest OrganizationMigrationRequest { get; set; }
+
+        /// <summary>
+        /// Requests for this user to become the admin of a <see cref="User"/> account that was transformed into an <see cref="Organization"/> account.
+        /// </summary>
+        public virtual ICollection<OrganizationMigrationRequest> OrganizationMigrationRequests { get; set; }
 
         [StringLength(256)]
         public string EmailAddress { get; set; }
@@ -124,6 +131,11 @@ namespace NuGetGallery
         public virtual ICollection<Credential> Credentials { get; set; }
 
         public virtual ICollection<UserSecurityPolicy> SecurityPolicies { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collection of user certificates.
+        /// </summary>
+        public virtual ICollection<UserCertificate> UserCertificates { get; set; }
 
         public void ConfirmEmailAddress()
         {

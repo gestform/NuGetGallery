@@ -9,20 +9,38 @@ namespace NuGetGallery
     public class OrganizationMemberViewModel
     {
         public OrganizationMemberViewModel(Membership membership)
+            : this(membership?.Member)
         {
-            var member = membership?.Member ?? throw new ArgumentNullException(nameof(membership));
+            IsAdmin = membership.IsAdmin;
+            Pending = false;
+        }
+
+        public OrganizationMemberViewModel(MembershipRequest request)
+            : this(request?.NewMember)
+        {
+            IsAdmin = request.IsAdmin;
+            Pending = true;
+        }
+
+        private OrganizationMemberViewModel(User member)
+        {
+            if (member == null)
+            {
+                throw new ArgumentNullException(nameof(member));
+            }
 
             Username = member.Username;
             EmailAddress = member.EmailAddress;
-            IsAdmin = membership.IsAdmin;
             GravatarUrl = GravatarHelper.Url(EmailAddress, Constants.GravatarElementSize);
         }
 
         public string Username { get; }
 
-        public string EmailAddress { get; }
-
         public bool IsAdmin { get; }
+
+        public bool Pending { get; }
+
+        public string EmailAddress { get; }
 
         public string GravatarUrl { get; }
     }

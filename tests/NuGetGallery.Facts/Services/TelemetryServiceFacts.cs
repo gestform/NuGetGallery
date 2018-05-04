@@ -36,6 +36,22 @@ namespace NuGetGallery
                     var package = fakes.Package.Packages.First();
                     var identity = Fakes.ToIdentity(fakes.User);
 
+                    yield return new object[] { "CertificateActivated",
+                        (TrackAction)(s => s.TrackCertificateActivated("thumbprint"))
+                    };
+
+                    yield return new object[] { "CertificateAdded",
+                        (TrackAction)(s => s.TrackCertificateAdded("thumbprint"))
+                    };
+
+                    yield return new object[] { "CertificateDeactivated",
+                        (TrackAction)(s => s.TrackCertificateDeactivated("thumbprint"))
+                    };
+
+                    yield return new object[] { "PackageRegistrationRequiredSignerSet",
+                        (TrackAction)(s => s.TrackRequiredSignerSet(package.PackageRegistration.Id))
+                    };
+
                     yield return new object[] { "ODataQueryFilter",
                         (TrackAction)(s => s.TrackODataQueryFilterEvent("callContext", true, true, "queryPattern"))
                     };
@@ -88,6 +104,14 @@ namespace NuGetGallery
                         (TrackAction)(s => s.TrackNewUserRegistrationEvent(fakes.User, fakes.User.Credentials.First()))
                     };
 
+                    yield return new object[] { "UserMultiFactorAuthenticationEnabled",
+                        (TrackAction)(s => s.TrackUserChangedMultiFactorAuthentication(fakes.User, enabledMultiFactorAuth: true))
+                    };
+
+                    yield return new object[] { "UserMultiFactorAuthenticationDisabled",
+                        (TrackAction)(s => s.TrackUserChangedMultiFactorAuthentication(fakes.User, enabledMultiFactorAuth: false))
+                    };
+
                     yield return new object[] { "CredentialAdded",
                         (TrackAction)(s => s.TrackNewCredentialCreated(fakes.User, fakes.User.Credentials.First()))
                     };
@@ -115,6 +139,26 @@ namespace NuGetGallery
                             "4.5.0",
                             ReportPackageReason.ReleasedInPublicByAccident,
                             success: true))
+                    };
+
+                    yield return new object[] { "OrganizationTransformInitiated",
+                        (TrackAction)(s => s.TrackOrganizationTransformInitiated(fakes.User))
+                    };
+
+                    yield return new object[] { "OrganizationTransformCompleted",
+                        (TrackAction)(s => s.TrackOrganizationTransformCompleted(fakes.Organization))
+                    };
+
+                    yield return new object[] { "OrganizationTransformDeclined",
+                        (TrackAction)(s => s.TrackOrganizationTransformDeclined(fakes.User))
+                    };
+
+                    yield return new object[] { "OrganizationTransformCancelled",
+                        (TrackAction)(s => s.TrackOrganizationTransformCancelled(fakes.User))
+                    };
+
+                    yield return new object[] { "OrganizationAdded",
+                        (TrackAction)(s => s.TrackOrganizationAdded(fakes.Organization))
                     };
                 }
             }
@@ -287,6 +331,184 @@ namespace NuGetGallery
                         packageVersion: null,
                         reason: ReportPackageReason.ReleasedInPublicByAccident,
                         success: true));
+            }
+
+            [Fact]
+            public void TrackOrganizationTransformInitiatedThrowsIfNullUser()
+            {
+                // Arrange
+                var service = CreateService();
+
+                // Act & Assert
+                Assert.Throws<ArgumentNullException>(() =>
+                    service.TrackOrganizationTransformInitiated(null));
+            }
+
+            [Fact]
+            public void TrackOrganizationTransformCompletedThrowsIfNullOrganization()
+            {
+                // Arrange
+                var service = CreateService();
+
+                // Act & Assert
+                Assert.Throws<ArgumentNullException>(() =>
+                    service.TrackOrganizationTransformCompleted(null));
+            }
+
+            [Fact]
+            public void TrackOrganizationTransformDeclinedThrowsIfNullUser()
+            {
+                // Arrange
+                var service = CreateService();
+
+                // Act & Assert
+                Assert.Throws<ArgumentNullException>(() =>
+                    service.TrackOrganizationTransformDeclined(null));
+            }
+
+            [Fact]
+            public void TrackOrganizationTransformCancelledThrowsIfNullUser()
+            {
+                // Arrange
+                var service = CreateService();
+
+                // Act & Assert
+                Assert.Throws<ArgumentNullException>(() =>
+                    service.TrackOrganizationTransformCancelled(null));
+            }
+
+            [Fact]
+            public void TrackOrganizationAddedThrowsIfNullUser()
+            {
+                // Arrange
+                var service = CreateService();
+
+                // Act & Assert
+                Assert.Throws<ArgumentNullException>(() =>
+                    service.TrackOrganizationAdded(null));
+            }
+
+            [Theory]
+            [InlineData(null)]
+            [InlineData("")]
+            public void TrackCertificateAdded_WhenThumbprintIsInvalid_Throws(string thumbprint)
+            {
+                var service = CreateService();
+                var exception = Assert.Throws<ArgumentException>(
+                    () => service.TrackCertificateAdded(thumbprint));
+
+                Assert.Equal("thumbprint", exception.ParamName);
+                Assert.StartsWith("The argument cannot be null or empty.", exception.Message);
+            }
+
+            [Fact]
+            public void TrackCertificateAdded_WhenThumbprintIsValid_Throws()
+            {
+                const string thumbprint = "a";
+
+                var service = CreateServiceForCertificateTelemetry("CertificateAdded", thumbprint);
+
+                service.TrackCertificateAdded(thumbprint);
+
+                service.TelemetryClient.VerifyAll();
+            }
+
+            [Theory]
+            [InlineData(null)]
+            [InlineData("")]
+            public void TrackCertificateActivated_WhenThumbprintIsInvalid_Throws(string thumbprint)
+            {
+                var service = CreateService();
+                var exception = Assert.Throws<ArgumentException>(
+                    () => service.TrackCertificateActivated(thumbprint));
+
+                Assert.Equal("thumbprint", exception.ParamName);
+                Assert.StartsWith("The argument cannot be null or empty.", exception.Message);
+            }
+
+            [Fact]
+            public void TrackCertificateActivated_WhenThumbprintIsValid_Throws()
+            {
+                const string thumbprint = "a";
+
+                var service = CreateServiceForCertificateTelemetry("CertificateActivated", thumbprint);
+
+                service.TrackCertificateActivated(thumbprint);
+
+                service.TelemetryClient.VerifyAll();
+            }
+
+            [Theory]
+            [InlineData(null)]
+            [InlineData("")]
+            public void TrackCertificateDeactivated_WhenThumbprintIsInvalid_Throws(string thumbprint)
+            {
+                var service = CreateService();
+                var exception = Assert.Throws<ArgumentException>(
+                    () => service.TrackCertificateDeactivated(thumbprint));
+
+                Assert.Equal("thumbprint", exception.ParamName);
+                Assert.StartsWith("The argument cannot be null or empty.", exception.Message);
+            }
+
+            [Fact]
+            public void TrackCertificateDeactivated_WhenThumbprintIsValid_Throws()
+            {
+                const string thumbprint = "a";
+
+                var service = CreateServiceForCertificateTelemetry("CertificateDeactivated", thumbprint);
+
+                service.TrackCertificateDeactivated(thumbprint);
+
+                service.TelemetryClient.VerifyAll();
+            }
+
+            [Theory]
+            [InlineData(null)]
+            [InlineData("")]
+            public void TrackRequiredSignerSet_WhenPackageRegistrationIsInvalid_Throws(string packageId)
+            {
+                var service = CreateService();
+                var exception = Assert.Throws<ArgumentException>(
+                    () => service.TrackRequiredSignerSet(packageId));
+
+                Assert.Equal("packageId", exception.ParamName);
+                Assert.StartsWith("The argument cannot be null or empty.", exception.Message);
+            }
+
+            [Fact]
+            public void TrackRequiredSignerSet_WhenPackageRegistrationIsValid_Throws()
+            {
+                const string packageId = "a";
+
+                var service = CreateService();
+
+                service.TelemetryClient.Setup(
+                   x => x.TrackMetric(
+                       It.Is<string>(name => name == "PackageRegistrationRequiredSignerSet"),
+                       It.Is<double>(value => value == 1),
+                       It.Is<IDictionary<string, string>>(
+                           properties => properties.Count == 1 &&
+                               properties["PackageId"] == packageId)));
+
+                service.TrackRequiredSignerSet(packageId);
+
+                service.TelemetryClient.VerifyAll();
+            }
+
+            private TelemetryServiceWrapper CreateServiceForCertificateTelemetry(string metricName, string thumbprint)
+            {
+                var service = CreateService();
+
+                service.TelemetryClient.Setup(
+                   x => x.TrackMetric(
+                       It.Is<string>(name => name == metricName),
+                       It.Is<double>(value => value == 1),
+                       It.Is<IDictionary<string, string>>(
+                           properties => properties.Count == 1 &&
+                               properties["Sha256Thumbprint"] == thumbprint)));
+
+                return service;
             }
         }
 

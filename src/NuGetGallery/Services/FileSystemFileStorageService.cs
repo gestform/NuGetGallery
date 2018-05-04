@@ -4,7 +4,6 @@
 using System;
 using System.Globalization;
 using System.IO;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Web.Hosting;
 using System.Web.Mvc;
@@ -147,7 +146,7 @@ namespace NuGetGallery
             var dirPath = Path.GetDirectoryName(filePath);
 
             _fileSystemService.CreateDirectory(dirPath);
-                        
+
             try
             {
                 using (var file = _fileSystemService.OpenWrite(filePath, overwrite))
@@ -157,8 +156,8 @@ namespace NuGetGallery
             }
             catch (IOException ex)
             {
-                throw new InvalidOperationException(
-                    String.Format(
+                throw new FileAlreadyExistsException(
+                    string.Format(
                         CultureInfo.CurrentCulture,
                         "There is already a file with name {0} in folder {1}.",
                         fileName,
@@ -207,14 +206,14 @@ namespace NuGetGallery
             var destFilePath = BuildPath(_configuration.FileStorageDirectory, destFolderName, destFileName);
 
             _fileSystemService.CreateDirectory(Path.GetDirectoryName(destFilePath));
-            
+
             try
             {
                 _fileSystemService.Copy(srcFilePath, destFilePath, overwrite: false);
             }
             catch (IOException e)
             {
-                throw new InvalidOperationException("Could not copy because destination file already exists", e);
+                throw new FileAlreadyExistsException("Could not copy because destination file already exists", e);
             }
 
             return Task.FromResult<string>(null);
@@ -234,6 +233,12 @@ namespace NuGetGallery
             // produces the
             // file:///c:/Afoo%20bar%2525.baz
             // which is not particularly correct, so we'd need to work around that to have a correct implementation
+            throw new NotImplementedException();
+        }
+
+        public Task<Uri> GetPriviledgedFileUriAsync(string folderName, string fileName, FileUriPermissions permissions, DateTimeOffset endOfAccess)
+        {
+            /// Not implemented for the same reason as <see cref="GetFileReadUriAsync(string, string, DateTimeOffset?)"/>.
             throw new NotImplementedException();
         }
 
